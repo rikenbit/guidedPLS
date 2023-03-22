@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/135140554.svg)](https://zenodo.org/badge/latestdoi/135140554)
+[![DOI](https://zenodo.org/badge/614626969.svg)](https://zenodo.org/badge/latestdoi/614626969)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/guidedPLS)](
 https://cran.r-project.org/package=guidedPLS)
 [![Downloads](https://cranlogs.r-pkg.org/badges/guidedPLS)](https://CRAN.R-project.org/package=guidedPLS)
