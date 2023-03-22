@@ -1,0 +1,178 @@
+---
+title: "1. Partial Least Squares (PLS) Models"
+author:
+- name: Koki Tsuyuzaki
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+  email: k.t.the-answer@hotmail.co.jp
+date: "`r Sys.Date()`"
+bibliography: bibliography.bib
+package: guidedPLS
+output: rmarkdown::html_vignette
+vignette: |
+  %\VignetteIndexEntry{1. Partial Least Squares (PLS) Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+In this vignette, we consider a supervised dimensional reduction method partial least squares (PLS).
+
+Test data is available from `toyModel`.
+
+```{r data, echo=TRUE}
+library("guidedPLS")
+data <- guidedPLS::toyModel("Easy")
+str(data, 2)
+```
+
+You will see that there are three blocks in the data matrix as follows.
+
+```{r data2, echo=TRUE, fig.height=6, fig.width=6}
+suppressMessages(library("fields"))
+layout(c(1,2,3))
+image.plot(data$Y1_dummy, main="Y1 (Dummy)", legend.mar=8)
+image.plot(data$Y1, main="Y1", legend.mar=8)
+image.plot(data$X1, main="X1", legend.mar=8)
+```
+
+# Partial Least Squares by Singular Value Decomposition (PLS-SVD)
+
+Here, suppose that we have two data matrices $X$ ($N \times M$) and $Y$ ($N \times L$), and their column vectors are assumed to be centered. Considering the projection of them to lower dimension, we have the scores $XV$ and $YW$, where $V$ ($M \times K$) and $W$ ($L \times K$) are called loading matrices for $X$ and $Y$, respectively. Depending on the loading matrice, these scores can take various values, but consider $V$ and $W$ such that the covariance is maximized as follows:
+
+$$
+\max_{V,W} \mathrm{tr}
+\left( V^{T}X^{T}YW \right)\ \mathrm{s.t.}\ V^{T}V = W^{T}W = I_{K}
+$$
+
+This is known as Partial Least Squares (PLS). The widely used PLS algorithms are NIPALS and SIMPLS but here we introduce more simple one, Partial Least Squares by Singular Value Decomposition (PLS-SVD [@plsda]). PLS-SVD is solved by svd against cross-product matrix $X'Y$. This formulation is also known as Guided Principal Component Analysis (guided-PCA [@guidedpca]).
+
+## Basic Usage
+
+`PLSSVD` is performed as follows.
+
+```{r plssvd, echo=TRUE}
+out1 <- PLSSVD(X=data$X1, Y=data$Y1, k=2)
+```
+
+```{r plotplssvd, echo=TRUE, fig.height=4, fig.width=4}
+plot(out1$scoreX, col=data$col1, pch=16)
+```
+
+Optionally, deflation mode, in which each loading and score vector is calculated incrementally, not at once, can be applied as follows.
+
+```{r plssvd2, echo=TRUE}
+out2 <- PLSSVD(X=data$X1, Y=data$Y1, k=2, deflation=TRUE)
+```
+
+```{r plotplssvd2, echo=TRUE, fig.height=4, fig.width=4}
+plot(out2$scoreX, col=data$col1, pch=16)
+```
+
+This mode is often used to make the column vectors of a score matrix orthogonal to each other.
+
+# Partial Least Squares Discriminant Analysis (PLS-DA)
+
+In many cases, $X$ and $Y$ in PLS are assumed to be continuous. On the other hand, some matrices containing discrete values may be set for $Y$. For example, a dummy variable matrix containing only the values 0 and 1, which means the correspondence of data and group in $X$, is used as $Y$. Such a formulation is called Partial Least Squares Discriminant Analysis (PLS-DA [@plsda]). In the context of distinguishing it from PLS-DA, the former is called Partial Least Squares Regression (PLS-R).
+
+## Basic Usage
+
+PLS-DA by `PLSSVD` is performed as follows.
+
+```{r plsda, echo=TRUE}
+out3 <- PLSSVD(X=data$X1, Y=data$Y1_dummy, k=2, fullrank=TRUE)
+```
+
+```{r plotplsda, echo=TRUE, fig.height=4, fig.width=4}
+plot(out3$scoreX, col=data$col1, pch=16)
+```
+
+# Sparse Partial Least Squares Discriminant Analysis (sPLS-DA)
+
+Sparse Partial Least Squares Discriminant Analysis (sPLS-DA [@plsda]) is an extension of PLS-DA to enhance the interpretability of the scores and loadings by making the values sparse. Soft-thresholding function forces the values within a certain range ($-\lambda$ to $\lambda$) to be adjusted to zero.
+
+## Basic Usage
+
+`sPLSDA` is performed as follows.
+
+Unlike PLSDA, `sPLSDA` has a `lambda` parameter that controls the degree of sparsity of the solution:
+
+```{r splsda, echo=TRUE}
+out4 <- sPLSDA(X=data$X1, Y=data$Y1_dummy, k=2, lambda=30)
+```
+
+The scores look almost identical to those of PLSDA:
+
+```{r plotsplsda, echo=TRUE, fig.height=4, fig.width=4}
+plot(out4$scoreX, col=data$col1, pch=16)
+```
+
+However, you will see that the solution (loading) is sparser than PLSDA:
+
+```{r plotsplsda2, echo=TRUE, fig.height=4, fig.width=8}
+layout(cbind(1:2, 3:4))
+barplot(out3$loadingX[,1], main="PLSDA (1st loading)")
+barplot(out3$loadingX[,2], main="PLSDA (2nd loading)")
+barplot(out4$loadingX[,1], main="sPLSDA (1st loading)")
+barplot(out4$loadingX[,2], main="sPLSDA (2nd loading)")
+```
+
+# Comparison with unsupervised learning
+
+Next, we use another data `data2`.
+
+```{r noisydata, echo=TRUE}
+data2 <- guidedPLS::toyModel("Hard")
+str(data2, 2)
+```
+
+`data2` has some blocks at the same coordinates as `data` in the matrix, but the background noise is larger and the block values are set smaller than `data`, resulting in a low S/N ratio like below.
+
+```{r noisydata2, echo=TRUE, fig.height=6, fig.width=6}
+layout(t(1:2))
+image.plot(data$X1, main="X1", legend.mar=8)
+image.plot(data2$X1, main="X1 (Noisy)", legend.mar=8)
+```
+
+For such data, supervised learning has difficulty extracting the signal from the noise.
+For example, let's perform an unsupervised learning method principal component analysis (PCA) using only $X$.
+
+```{r noisypca, echo=TRUE}
+out.pca <- prcomp(data2$X1, center=TRUE, scale=FALSE)
+```
+
+Next, perform PLS-DA, which is a supervised learning using $X$, and label information $Y$ as well.
+
+```{r noisypcada, echo=TRUE}
+out5 <- PLSSVD(X=data2$X1, Y=data2$Y1_dummy, k=2, fullrank=TRUE)
+```
+
+Comparing the two, it is clear that PLS-DA, which uses labels, captures the structure of the data better like below.
+
+```{r noisyplot, echo=TRUE, fig.height=4, fig.width=8}
+layout(t(1:2))
+plot(out.pca$x[, 1:2], col=data2$col1, main="PCA", pch=16)
+plot(out5$scoreX, col=data2$col1, main="PLS-DA", pch=16)
+```
+
+Let's compare the two with the PLS-DA loading performed on data.
+In PCA loading, PC1 correlates well with PLS-DA loading, but the correlation is a bit smaller for PC2.
+In contrast, in PLS-DA (Noisy), the first and second loadings correlate well with the PLS-DA loadings.
+In other words, the use of labels mitigates the effect of noise.
+
+```{r noisyplot2, echo=TRUE, fig.height=4, fig.width=8}
+layout(t(1:2))
+image.plot(cor(out5$scoreX, out.pca$x[,1:2]),
+xlab="PLS-DA (Noisy)", ylab="PCA (Noisy)", legend.mar=8)
+image.plot(cor(out5$scoreX, out3$scoreX),
+xlab="PLS-DA (Noisy)", ylab="PLS-DA", legend.mar=8)
+```
+
+# Session Information {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```
+
+# References

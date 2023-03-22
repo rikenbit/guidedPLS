@@ -1,0 +1,11 @@
+importFrom(stats, cor, cor.test, p.adjust, rpois)
+importFrom(irlba, irlba)
+
+export(
+    PLSSVD,
+    sPLSDA,
+    guidedPLS,
+    softThr,
+    dummyMatrix,
+    toyModel
+    )
