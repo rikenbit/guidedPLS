@@ -13,7 +13,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-Description: guided partial least squares (guided-PLS) is the combination of partial least squares by singular value decomposition (PLS-SVD) and guided principal component analysis (guided-PCA). For the details of the methods, see the reference section of GitHub README.md <https://github.com/rikenbit/guidedPLS>.
+Description: Guided partial least squares (guided-PLS) is the combination of partial least squares by singular value decomposition (PLS-SVD) and guided principal component analysis (guided-PCA). For the details of the methods, see the reference section of GitHub README.md <https://github.com/rikenbit/guidedPLS>.
 License: MIT + file LICENSE
 URL: https://github.com/rikenbit/guidedPLS
 VignetteBuilder: knitr
