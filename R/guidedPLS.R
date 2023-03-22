@@ -97,7 +97,12 @@ stopifnot(is.matrix(X1))
     if(verbose){
         cat("# Initialization Step...\n")
     }
-	# Auto scaling of Cross-product Matrix
+    # Auto scaling
+    X1 <- t(scale(t(X1), center=TRUE, scale=TRUE))
+    X2 <- t(scale(t(X2), center=TRUE, scale=TRUE))
+    Y1 <- t(scale(t(Y1), center=TRUE, scale=TRUE))
+    Y2 <- t(scale(t(Y2), center=TRUE, scale=TRUE))
+    # Auto scaling of Cross-product Matrix
     YX1 <- scale(t(Y1) %*% X1, center=TRUE, scale=TRUE)
     YX2 <- scale(t(Y2) %*% X2, center=TRUE, scale=TRUE)
     # Cross-Cross-product Matrix

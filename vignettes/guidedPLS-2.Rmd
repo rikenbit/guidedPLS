@@ -39,7 +39,7 @@ image.plot(data$X1, main="X1", legend.mar=8)
 
 # Guided Partial Least Squares (guided-PLS)
 
-Here, suppose that we have two data matrices $X_1$ ($N \times M$) and $X_2$ ($S \times T$), and the column vectors of them are assumed to be centered. Since these two matrices have no common row or column, integration of them is not trivial. Such a data structure is called "diagonal" and known as a barrier to omics data integration [@diagonal].
+Here, suppose that we have two data matrices $X_1$ ($N \times M$) and $X_2$ ($S \times T$), and the row vectors of them are assumed to be centered. Since these two matrices have no common row or column, integration of them is not trivial. Such a data structure is called "diagonal" and known as a barrier to omics data integration [@diagonal].
 
 Here is a simpler way to set up the problem; suppose that we have another set of matrices $Y_1$ ($M \times I$) and $Y_2$ ($T \times I$), which are the label matrices for $X_1$ and $X_2$, respectively.
 
@@ -63,7 +63,7 @@ out <- guidedPLS(X1=data$X1, X2=data$X2, Y1=data$Y1, Y2=data$Y2, k=2)
 ```{r plotplssvd, echo=TRUE, fig.height=4, fig.width=4}
 plot(rbind(out$scoreX1, out$scoreX2), col=c(data$col1, data$col2),
 pch=c(rep(2, length=nrow(out$scoreX1)), rep(3, length=nrow(out$scoreX2))))
-legend("bottomright", legend=c("XY1", "XY2"), pch=c(2,3))
+legend("bottomleft", legend=c("XY1", "XY2"), pch=c(2,3))
 ```
 
 # Session Information {.unnumbered}
