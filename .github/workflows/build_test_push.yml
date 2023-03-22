@@ -6,9 +6,9 @@ env:
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -65,6 +65,6 @@ jobs:
 
 # Ref
 # https://github.com/marketplace/actions/docker-login
-# https://github.com/inutano/cwl-log-generator/blob/master/.github/workflows/main.yml
+# https://github.com/inutano/cwl-log-generator/blob/main/.github/workflows/main.yml
 # https://www.docker.com/blog/first-docker-github-action-is-here/
 # https://github.com/docker/login-action
