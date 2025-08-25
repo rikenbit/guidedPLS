@@ -1,4 +1,4 @@
-sPLSDA <- function(X, Y, k=.minDim(X, Y), lambda=1, thr=1e-10, fullrank=TRUE,
+sPLSDA <- function(X, Y, k=.minDim(X, Y), cortest=FALSE, lambda=1, thr=1e-10, fullrank=TRUE,
     num.iter=10, verbose=FALSE){
     # Argument Check
 	.checksPLSDA(X, Y, k, lambda, thr, fullrank, num.iter, verbose)
@@ -54,7 +54,46 @@ sPLSDA <- function(X, Y, k=.minDim(X, Y), lambda=1, thr=1e-10, fullrank=TRUE,
 		Y <- Y - scoreX[, i] %*% t(d_i)
 		M <- t(X) %*% Y
 	}
-	list(scoreX=scoreX, loadingX=loadingX, scoreY=scoreY, loadingY=loadingY, d=d)
+    if(cortest){
+        if(verbose){
+            cat("# Correlation Test Step...\n")
+        }
+        # Correlation Coefficient
+        corX <- matrix(0, nrow=ncol(X), ncol=k)
+        corY <- matrix(0, nrow=ncol(Y), ncol=k)
+        for(i in seq_len(k)){
+            corX[,i] <- apply(X, 2, function(x){
+                cor(x, scoreY[, i])
+            })
+            corY[,i] <- apply(Y, 2, function(x){
+                cor(x, scoreX[, i])
+            })
+        }
+        # P-value / Q-value
+        pvalX <- matrix(0, nrow=ncol(X), ncol=k)
+        qvalX <- matrix(0, nrow=ncol(X), ncol=k)
+        pvalY <- matrix(0, nrow=ncol(Y), ncol=k)
+        qvalY <- matrix(0, nrow=ncol(Y), ncol=k)
+        for(i in seq_len(k)){
+            pvalX[, i] <- apply(X, 2, function(x){
+                cor.test(x, scoreY[, i])$p.value
+            })
+            pvalY[, i] <- apply(Y, 2, function(x){
+                cor.test(x, scoreX[, i])$p.value
+            })
+            qvalX[, i] <- p.adjust(pvalX[, i], "BH")
+            qvalY[, i] <- p.adjust(pvalY[, i], "BH")
+        }
+    }else{
+        corX = NULL
+        corY = NULL
+        pvalX = NULL
+        pvalY = NULL
+        qvalX = NULL
+        qvalY = NULL
+    }
+	# Output
+	list(scoreX=scoreX, loadingX=loadingX, scoreY=scoreY, loadingY=loadingY, d=d, corX=corX, corY=corY, pvalX=pvalX, pvalY=pvalY, qvalX=qvalX, qvalY=qvalY)
 }
 
 # Check Function

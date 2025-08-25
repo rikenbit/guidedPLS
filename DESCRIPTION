@@ -1,7 +1,7 @@
 Package: guidedPLS
 Type: Package
 Title: Supervised Dimensional Reduction by Guided Partial Least Squares
-Version: 0.99.0
+Version: 1.0.0
 Authors@R: c(person("Koki", "Tsuyuzaki", role = c("aut", "cre"),
                       email = "k.t.the-answer@hotmail.co.jp"))
 Depends:

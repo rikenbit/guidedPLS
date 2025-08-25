@@ -1,4 +1,4 @@
-PLSSVD <- function(X, Y, k=.minDim(X, Y), deflation=FALSE, fullrank=TRUE,
+PLSSVD <- function(X, Y, k=.minDim(X, Y), cortest=FALSE, deflation=FALSE, fullrank=TRUE,
     verbose=FALSE){
     # Argument Check
     .checkPLSSVD(X, Y, k, verbose)
@@ -41,7 +41,46 @@ PLSSVD <- function(X, Y, k=.minDim(X, Y), deflation=FALSE, fullrank=TRUE,
     # Projection
     scoreX <- X %*% loadingX
     scoreY <- Y %*% loadingY
-    list(scoreX=scoreX, loadingX=loadingX, scoreY=scoreY, loadingY=loadingY, d=d)
+    if(cortest){
+        if(verbose){
+            cat("# Correlation Test Step...\n")
+        }
+        # Correlation Coefficient
+        corX <- matrix(0, nrow=ncol(X), ncol=k)
+        corY <- matrix(0, nrow=ncol(Y), ncol=k)
+        for(i in seq_len(k)){
+            corX[,i] <- apply(X, 2, function(x){
+                cor(x, scoreY[, i])
+            })
+            corY[,i] <- apply(Y, 2, function(x){
+                cor(x, scoreX[, i])
+            })
+        }
+        # P-value / Q-value
+        pvalX <- matrix(0, nrow=ncol(X), ncol=k)
+        qvalX <- matrix(0, nrow=ncol(X), ncol=k)
+        pvalY <- matrix(0, nrow=ncol(Y), ncol=k)
+        qvalY <- matrix(0, nrow=ncol(Y), ncol=k)
+        for(i in seq_len(k)){
+            pvalX[, i] <- apply(X, 2, function(x){
+                cor.test(x, scoreY[, i])$p.value
+            })
+            pvalY[, i] <- apply(Y, 2, function(x){
+                cor.test(x, scoreX[, i])$p.value
+            })
+            qvalX[, i] <- p.adjust(pvalX[, i], "BH")
+            qvalY[, i] <- p.adjust(pvalY[, i], "BH")
+        }
+    }else{
+        corX = NULL
+        corY = NULL
+        pvalX = NULL
+        pvalY = NULL
+        qvalX = NULL
+        qvalY = NULL
+    }
+    # Output
+    list(scoreX=scoreX, loadingX=loadingX, scoreY=scoreY, loadingY=loadingY, d=d, corX=corX, corY=corY, pvalX=pvalX, pvalY=pvalY, qvalX=qvalX, qvalY=qvalY)
 }
 
 # Check Function
