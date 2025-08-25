@@ -1,3 +1,15 @@
+   VERSION 1.1.0
+------------------------
+   o Added guidedPCA() function for guided principal component analysis
+   o guidedPCA() automatically handles mixed data types (continuous, categorical, logical)
+   o Added automatic dummy variable encoding for categorical variables
+   o Added feature contribution analysis to identify important features per component
+   o Added variance explained calculation for each component
+   o Added print() and summary() methods for guidedPCA objects
+   o Added comprehensive unit tests for guidedPCA()
+   o Updated package documentation with detailed algorithm descriptions
+   o Added 'stats' to Imports for better dependency management
+
    VERSION 1.0.0
 ------------------------
    o Added cortest in PLSSVD() and sPLSDA()

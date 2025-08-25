@@ -31,6 +31,8 @@ devtools::install_github("rikenbit/guidedPLS")
   - Lê Cao, et al. A Sparse PLS for Variable Selection when Integrating Omics Data. Statistical Applications in Genetics and Molecular Biology, 7(1), 2008
 - **Guided Principal Component Analysis (guided-PCA)**
   - Reese S E, et al. A new statistic for identifying batch effects in high-throughput genomic data that uses guided principal component analysis. Bioinformatics, 29(22), 2877-2883, 2013
+- **Multiset Canonical Correlations Analysis**
+  - Nielsen A A. Multiset Canonical Correlations Analysis and Multispectral, Truly Multitemporal Remote Sensing Data. IEEE Transactions on Image Processing, 11(3), 293-305, 2002
 
 ## Contributing
 

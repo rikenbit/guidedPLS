@@ -1,11 +1,16 @@
 importFrom(stats, cor, cor.test, p.adjust, rpois)
+importFrom(utils, head)
 importFrom(irlba, irlba)
 
 export(
     PLSSVD,
     sPLSDA,
     guidedPLS,
+    guidedPCA,
     softThr,
     dummyMatrix,
     toyModel
     )
+
+S3method(print, guidedPCA)
+S3method(summary, guidedPCA)

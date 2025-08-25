@@ -45,3 +45,44 @@ expect_equal(dim(out3$pvalYX1), c(ncol(X1), 2))
 expect_equal(dim(out3$pvalYX2), c(ncol(X2), 2))
 expect_equal(dim(out3$qvalYX1), c(ncol(X1), 2))
 expect_equal(dim(out3$qvalYX2), c(ncol(X2), 2))
+
+# Test SUMCOR-based CCA implementation
+if(requireNamespace("geigen", quietly = TRUE)){
+    out4 <- guidedPLS(X1, X2, Y1, Y2, k=2, sumcor=TRUE, lambda=1e-6)
+    
+    expect_equal(length(out4$res$d), 2)
+    expect_equal(dim(out4$res$u), c(ncol(X1), 2))
+    expect_equal(dim(out4$res$v), c(ncol(X2), 2))
+    expect_equal(dim(out4$loadingYX1), c(ncol(X1), 2))
+    expect_equal(dim(out4$loadingYX2), c(ncol(X2), 2))
+    expect_equal(dim(out4$scoreX1), c(nrow(X1), 2))
+    expect_equal(dim(out4$scoreX2), c(nrow(X2), 2))
+    expect_equal(dim(out4$scoreYX1), c(ncol(Y1), 2))
+    expect_equal(dim(out4$scoreYX2), c(ncol(Y2), 2))
+    
+    # Test that loadings are normalized
+    for(i in 1:2){
+        expect_equal(sum(out4$loadingYX1[,i]^2), 1, tolerance=1e-10)
+        expect_equal(sum(out4$loadingYX2[,i]^2), 1, tolerance=1e-10)
+    }
+    
+    # Test SUMCOR with correlation test
+    out5 <- guidedPLS(X1, X2, Y1, Y2, k=3, sumcor=TRUE, cortest=TRUE, lambda=1e-4)
+    
+    expect_equal(length(out5$res$d), 3)
+    expect_equal(dim(out5$res$u), c(ncol(X1), 3))
+    expect_equal(dim(out5$res$v), c(ncol(X2), 3))
+    expect_equal(dim(out5$loadingYX1), c(ncol(X1), 3))
+    expect_equal(dim(out5$loadingYX2), c(ncol(X2), 3))
+    expect_equal(dim(out5$scoreX1), c(nrow(X1), 3))
+    expect_equal(dim(out5$scoreX2), c(nrow(X2), 3))
+    expect_equal(dim(out5$scoreYX1), c(ncol(Y1), 3))
+    expect_equal(dim(out5$scoreYX2), c(ncol(Y2), 3))
+    
+    expect_equal(dim(out5$corYX1), c(ncol(X1), 3))
+    expect_equal(dim(out5$corYX2), c(ncol(X2), 3))
+    expect_equal(dim(out5$pvalYX1), c(ncol(X1), 3))
+    expect_equal(dim(out5$pvalYX2), c(ncol(X2), 3))
+    expect_equal(dim(out5$qvalYX1), c(ncol(X1), 3))
+    expect_equal(dim(out5$qvalYX2), c(ncol(X2), 3))
+}

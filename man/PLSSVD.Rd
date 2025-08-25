@@ -21,7 +21,7 @@ The input matrix which has N-rows and M-columns.
 The input matrix which has N-rows and L-columns.
 }
 \item{k}{
-The number of low-dimension (k < {N, M, L}, Default: .minDim(X, Y))
+The number of low-dimension (k < \{N, M, L\}, Default: .minDim(X, Y))
 }
 \item{cortest}{
 If cortest is set as TRUE, t-test of correlation coefficient is performed (Default: FALSE)

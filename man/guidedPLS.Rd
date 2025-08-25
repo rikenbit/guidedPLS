@@ -13,7 +13,7 @@ and Y1 and Y2 are supposed to share the columns.
 }
 \usage{
 guidedPLS(X1, X2, Y1, Y2, k=.minDim(X1, X2, Y1, Y2),
-    cortest=FALSE, fullrank=TRUE, verbose=FALSE)
+    cortest=FALSE, fullrank=TRUE, sumcor=FALSE, lambda=1e-6, verbose=FALSE)
 }
 
 \arguments{
@@ -30,13 +30,19 @@ The input matrix which has O-rows and P-columns.
 The input matrix which has O-rows and L-columns.
 }
 \item{k}{
-The number of low-dimension (k < {N, M, L, O}, Default: .minDim(X1, X2, Y1, Y2))
+The number of low-dimension (k < \{N, M, L, O\}, Default: .minDim(X1, X2, Y1, Y2))
 }
 \item{cortest}{
 If cortest is set as TRUE, t-test of correlation coefficient is performed (Default: FALSE)
 }
 \item{fullrank}{
 If fullrank is set as TRUE, irlba is used, otherwise fullrank SVD is used (Default: TRUE)
+}
+\item{sumcor}{
+If sumcor is set as TRUE, SUMCOR-based CCA using generalized eigenvalue decomposition is performed instead of SVD-based approach. This maximizes Tr(W1^T X1^T Y1 Y2^T X2 W2) subject to W1^T X1^T X1 W1 = I and W2^T X2^T X2 W2 = I (Default: FALSE). Requires the geigen package.
+}
+\item{lambda}{
+Regularization parameter for numerical stability in SUMCOR-based CCA. Only used when sumcor=TRUE (Default: 1e-6). Larger values provide more regularization.
 }
 \item{verbose}{
 Verbose option (Default: FALSE)
