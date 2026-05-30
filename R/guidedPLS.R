@@ -22,31 +22,44 @@ guidedPLS <- function(X1, X2, Y1, Y2, k=.minDim(X1, X2, Y1, Y2),
         # Objective: max Tr(W1^T X1^T Y1 Y2^T X2 W2)
         # Constraints: W1^T X1^T X1 W1 = I, W2^T X2^T X2 W2 = I
         
-        # Center the data
-        X1_centered <- t(scale(t(X1), center=TRUE, scale=FALSE))
-        X2_centered <- t(scale(t(X2), center=TRUE, scale=FALSE))
+        # Center the data (row-wise centering: subtract row means)
         Y1_centered <- t(scale(t(Y1), center=TRUE, scale=FALSE))
         Y2_centered <- t(scale(t(Y2), center=TRUE, scale=FALSE))
-        
+
         # Dimensions
         p1 <- ncol(X1)
         p2 <- ncol(X2)
-        
+        n1 <- nrow(X1)
+        n2 <- nrow(X2)
+
+        # SUMCOR requires p x p covariance matrices, so densify sparse X
+        if(.is_sparse(X1)){
+            if(verbose) cat("# SUMCOR: converting sparse X1 to dense (p x p covariance needed)\n")
+            X1 <- as.matrix(X1)
+        }
+        if(.is_sparse(X2)){
+            if(verbose) cat("# SUMCOR: converting sparse X2 to dense (p x p covariance needed)\n")
+            X2 <- as.matrix(X2)
+        }
+        X1_centered <- t(scale(t(X1), center=TRUE, scale=FALSE))
+        X2_centered <- t(scale(t(X2), center=TRUE, scale=FALSE))
+
         # Build the concatenated cross-covariance matrix C
         # C = [0, C12; C21, 0] where C12 = X1^T Y1 Y2^T X2 / n
-        C12 <- (t(X1_centered) %*% Y1_centered %*% t(Y2_centered) %*% X2_centered) / (nrow(X1) * nrow(X2))
+        C12 <- (t(X1_centered) %*% Y1_centered %*% t(Y2_centered) %*% X2_centered) / (n1 * n2)
+
+        # Build the concatenated covariance matrix D (block diagonal)
+        # D = [D11, 0; 0, D22] where D11 = X1^T X1 / n, D22 = X2^T X2 / n
+        D11 <- (t(X1_centered) %*% X1_centered) / n1
+        D22 <- (t(X2_centered) %*% X2_centered) / n2
+
         C21 <- t(C12)
-        
+
         # Create block matrix C
         C <- matrix(0, nrow=p1+p2, ncol=p1+p2)
         C[1:p1, (p1+1):(p1+p2)] <- C12
         C[(p1+1):(p1+p2), 1:p1] <- C21
-        
-        # Build the concatenated covariance matrix D (block diagonal)
-        # D = [D11, 0; 0, D22] where D11 = X1^T X1 / n, D22 = X2^T X2 / n
-        D11 <- (t(X1_centered) %*% X1_centered) / nrow(X1)
-        D22 <- (t(X2_centered) %*% X2_centered) / nrow(X2)
-        
+
         # Add regularization for numerical stability
         D11_reg <- D11 + lambda * diag(p1)
         D22_reg <- D22 + lambda * diag(p2)
@@ -99,8 +112,8 @@ guidedPLS <- function(X1, X2, Y1, Y2, k=.minDim(X1, X2, Y1, Y2),
     }
     
     # Score
-    scoreX1 <- X1 %*% loadingYX1
-    scoreX2 <- X2 %*% loadingYX2
+    scoreX1 <- as.matrix(X1 %*% loadingYX1)
+    scoreX2 <- as.matrix(X2 %*% loadingYX2)
     # Smaller Score
     scoreYX1 <- YX1 %*% loadingYX1
     scoreYX2 <- YX2 %*% loadingYX2
@@ -155,8 +168,8 @@ guidedPLS <- function(X1, X2, Y1, Y2, k=.minDim(X1, X2, Y1, Y2),
     if(verbose){
         cat("# Input Check Step...\n")
     }
-stopifnot(is.matrix(X1))
-    stopifnot(is.matrix(X2))
+    stopifnot(is.matrix(X1) || .is_sparse(X1))
+    stopifnot(is.matrix(X2) || .is_sparse(X2))
     stopifnot(is.matrix(Y1))
     stopifnot(is.matrix(Y2))
     stopifnot(nrow(X1) == nrow(Y1))
@@ -176,14 +189,36 @@ stopifnot(is.matrix(X1))
     if(verbose){
         cat("# Initialization Step...\n")
     }
-    # Auto scaling
-    X1 <- t(scale(t(X1), center=TRUE, scale=TRUE))
-    X2 <- t(scale(t(X2), center=TRUE, scale=TRUE))
+    # Y matrices are always small (samples x k), so row-standardize normally
     Y1 <- t(scale(t(Y1), center=TRUE, scale=TRUE))
     Y2 <- t(scale(t(Y2), center=TRUE, scale=TRUE))
-    # Auto scaling of Cross-product Matrix
-    YX1 <- scale(t(Y1) %*% X1, center=TRUE, scale=TRUE)
-    YX2 <- scale(t(Y2) %*% X2, center=TRUE, scale=TRUE)
+    # Cross-product with row-standardized X
+    use_sparse <- .is_sparse(X1) || .is_sparse(X2)
+    if(use_sparse){
+        if(verbose){
+            cat("# Sparse-aware path for X matrices...\n")
+            if(.is_sparse(X1)){
+                cat(sprintf("#   X1: %d x %d, density=%.4f\n",
+                    nrow(X1), ncol(X1), .matrix_density(X1)))
+            }
+            if(.is_sparse(X2)){
+                cat(sprintf("#   X2: %d x %d, density=%.4f\n",
+                    nrow(X2), ncol(X2), .matrix_density(X2)))
+            }
+        }
+        # Compute t(Y_std) %*% X_std without materializing dense X_std
+        YX1 <- .crossprod_row_standardized(X1, Y1)
+        YX2 <- .crossprod_row_standardized(X2, Y2)
+    }else{
+        # Original dense path
+        X1 <- t(scale(t(X1), center=TRUE, scale=TRUE))
+        X2 <- t(scale(t(X2), center=TRUE, scale=TRUE))
+        YX1 <- t(Y1) %*% X1
+        YX2 <- t(Y2) %*% X2
+    }
+    # Auto scaling of Cross-product Matrix (always small: k x p)
+    YX1 <- scale(YX1, center=TRUE, scale=TRUE)
+    YX2 <- scale(YX2, center=TRUE, scale=TRUE)
     # Cross-Cross-product Matrix
     M <- t(YX1) %*% YX2
     list(YX1=YX1, YX2=YX2, M=M)

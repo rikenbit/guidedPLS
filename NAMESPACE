@@ -1,6 +1,7 @@
 importFrom(stats, cor, cor.test, p.adjust, rpois)
 importFrom(utils, head)
 importFrom(irlba, irlba)
+import(Matrix)
 
 export(
     PLSSVD,

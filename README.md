@@ -25,6 +25,20 @@ library(devtools)
 devtools::install_github("rikenbit/guidedPLS")
 ~~~~
 
+## Sparse matrix support (v1.2.0)
+
+`guidedPLS()` accepts `Matrix::dgCMatrix` (sparse matrices) for `X1` and `X2`.
+This is particularly useful for single-cell data (scRNA-seq, scATAC-seq) where feature matrices are large and sparse.
+
+Internally, the row-centered cross-product is computed without materializing the dense centered matrix, using the identity:
+
+```
+X_centered %*% Y = X %*% Y - mu * (1^T Y)
+```
+
+where `mu` is the vector of row means and `1^T Y = colSums(Y)`.
+Only the small `k x p` result matrix is dense, keeping memory usage proportional to the number of non-zero entries.
+
 ## References
 ======
 - **Sparse Partial Least Squares (sPLS)/Sparse Partial Least Squares Discriminant Analysis (sPLS-DA)**

@@ -1,3 +1,11 @@
+   VERSION 1.2.0
+------------------------
+   o Added sparse matrix support (Matrix::dgCMatrix) for guidedPLS()
+   o X1, X2 can now be sparse matrices; avoids dense materialization of centered X
+   o Internally uses the identity X_c Y = X Y - mu (1^T Y) to keep X sparse
+   o Added Matrix to Imports
+   o Particularly effective for scATAC-seq peak matrices with low density
+
    VERSION 1.1.0
 ------------------------
    o Added guidedPCA() function for guided principal component analysis

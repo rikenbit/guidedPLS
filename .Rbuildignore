@@ -11,3 +11,5 @@
 ^.*\.Rhistory$
 ^Dockerfile$
 ^paper$
+^CLAUDE\.md$
+^\.claude$
