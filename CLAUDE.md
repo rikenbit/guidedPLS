@@ -33,7 +33,7 @@ The main function `guidedPLS(X1, X2, Y1, Y2, k)` computes metadata-guided cross-
 2. **Init** (`.initguidedPLS`): Row-standardize X and Y, compute cross-product `YX = scale(t(Y) %*% X)`, then `M = t(YX1) %*% YX2`
 3. **SVD**: Decompose M to get loadings; project X onto loadings for scores
 
-Two modes: default SVD-based and SUMCOR-based CCA (`sumcor=TRUE`, requires geigen).
+Two modes: default SVD-based and SUMCOR-based CCA (`sumcor=TRUE`, requires iTensor >= 1.0.6).
 
 ### Sparse matrix support (v1.2.0)
 
@@ -51,4 +51,4 @@ Each algorithm follows the pattern: `.check*()` for input validation, `.init*()`
 
 ### Test structure
 
-Tests are in `tests/testthat/` and registered in `tests/testthat.R`. Test files must be added to `testthat.R` manually. Tests validate output dimensions and numerical equivalence (e.g., sparse vs dense paths at tolerance 1e-8). SUMCOR tests are conditional on geigen being installed.
+Tests are in `tests/testthat/` and registered in `tests/testthat.R`. Test files must be added to `testthat.R` manually. Tests validate output dimensions and numerical equivalence (e.g., sparse vs dense paths at tolerance 1e-8). SUMCOR tests are conditional on iTensor being installed.

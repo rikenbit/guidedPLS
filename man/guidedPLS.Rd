@@ -39,7 +39,7 @@ If cortest is set as TRUE, t-test of correlation coefficient is performed (Defau
 If fullrank is set as TRUE, irlba is used, otherwise fullrank SVD is used (Default: TRUE)
 }
 \item{sumcor}{
-If sumcor is set as TRUE, SUMCOR-based CCA using generalized eigenvalue decomposition is performed instead of SVD-based approach. This maximizes Tr(W1^T X1^T Y1 Y2^T X2 W2) subject to W1^T X1^T X1 W1 = I and W2^T X2^T X2 W2 = I (Default: FALSE). Requires the geigen package.
+If sumcor is set as TRUE, SUMCOR-based CCA using generalized eigenvalue decomposition is performed instead of SVD-based approach. This maximizes Tr(W1^T X1^T Y1 Y2^T X2 W2) subject to W1^T X1^T X1 W1 = I and W2^T X2^T X2 W2 = I (Default: FALSE). Requires the iTensor package (>= 1.0.6).
 }
 \item{lambda}{
 Regularization parameter for numerical stability in SUMCOR-based CCA. Only used when sumcor=TRUE (Default: 1e-6). Larger values provide more regularization.

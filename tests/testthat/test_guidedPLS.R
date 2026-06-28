@@ -47,7 +47,7 @@ expect_equal(dim(out3$qvalYX1), c(ncol(X1), 2))
 expect_equal(dim(out3$qvalYX2), c(ncol(X2), 2))
 
 # Test SUMCOR-based CCA implementation
-if(requireNamespace("geigen", quietly = TRUE)){
+if(requireNamespace("iTensor", quietly = TRUE)){
     out4 <- guidedPLS(X1, X2, Y1, Y2, k=2, sumcor=TRUE, lambda=1e-6)
     
     expect_equal(length(out4$res$d), 2)

@@ -92,7 +92,7 @@ test_that("guidedPLS with sparse X and cortest matches dense", {
 })
 
 # --- Test 6: SUMCOR mode sparse equivalence ---
-if(requireNamespace("geigen", quietly = TRUE)){
+if(requireNamespace("iTensor", quietly = TRUE)){
     test_that("guidedPLS SUMCOR with sparse X matches dense", {
         out_dense <- guidedPLS(X1_dense, X2_dense, Y1, Y2, k = 2,
                                sumcor = TRUE, lambda = 1e-4)

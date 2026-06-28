@@ -13,9 +13,9 @@ guidedPLS <- function(X1, X2, Y1, Y2, k=.minDim(X1, X2, Y1, Y2),
         if(verbose){
             cat("# SUMCOR-based CCA Step...\n")
         }
-        # Check if geigen is available
-        if(!requireNamespace("geigen", quietly = TRUE)){
-            stop("Package 'geigen' is required for sumcor=TRUE. Please install it.")
+        # Check if iTensor is available
+        if(!requireNamespace("iTensor", quietly = TRUE)){
+            stop("Package 'iTensor' (>= 1.0.6) is required for sumcor=TRUE. Please install it.")
         }
         
         # Compute generalized eigenvalue decomposition
@@ -70,7 +70,7 @@ guidedPLS <- function(X1, X2, Y1, Y2, k=.minDim(X1, X2, Y1, Y2),
         D[(p1+1):(p1+p2), (p1+1):(p1+p2)] <- D22_reg
         
         # Solve generalized eigenvalue problem: C*W = D*W*Lambda
-        eigen_result <- geigen::geigen(C, D, symmetric=FALSE)
+        eigen_result <- iTensor::geigen(C, D, symmetric=TRUE)
         
         # Select top k components (by absolute value of eigenvalues)
         idx <- order(abs(eigen_result$values), decreasing=TRUE)[seq_len(k)]

@@ -1,3 +1,9 @@
+   VERSION 1.2.1
+------------------------
+   o Replaced geigen dependency with iTensor (>= 1.0.6) for SUMCOR-based CCA
+   o geigen package is scheduled for deprecation; iTensor::geigen is the replacement
+   o Updated Suggests: removed geigen, added iTensor (>= 1.0.6)
+
    VERSION 1.2.0
 ------------------------
    o Added sparse matrix support (Matrix::dgCMatrix) for guidedPLS()
